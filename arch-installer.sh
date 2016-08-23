@@ -27,9 +27,9 @@
 init() {
 
 	trap '' 2
-	source /etc/arch-anywhere.conf
+	source /etc/archNAS.conf
 	op_title=" -| Language Select |- "
-	ILANG=$(dialog --nocancel --menu "\nArch Anywhere Installer\n\n \Z2*\Zn Select your install language:" 20 60 10 \
+	ILANG=$(dialog --nocancel --menu "\archNAS Installer\n\n \Z2*\Zn Select your install language:" 20 60 10 \
 		"English" "-" \
 		"Chinese" "Chinese" \
 		"French" "Français" \
