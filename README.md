@@ -34,3 +34,51 @@ http://arch-anywhere.org/
 * Terminal
 
     SSH/SFTP <br />
+
+### Install:
+
+1. Go through the installer and install archNAS.
+
+2. Once you have booted login as `root` and enter these commands to install <b>cockpit</b>.
+
+`cd /tmp`
+
+`git clone https://aur.archlinux.org/cockpit.git`
+
+`tar -xvf cockpit.tar.gz`
+
+`cd cockpit`
+
+Check for errors:
+
+`nano PKGBUILD`
+
+`nano cockpit.install`
+
+`makepkg -sri`
+
+`systemctl start cockpit.service`
+
+`systemctl enable cockpit.service`
+
+You can access cockpit WebUI at:
+
+`https://ip-address-of-machine:9090`
+
+3. Now we need to install <b>docker</b>
+
+`pacman -S docker`
+
+`systemctl start docker.service`
+
+`systemctl enable docker.service`
+
+`docker info`
+
+If you want to be able to run docker as a regular user, add yourself to the docker group:
+
+`gpasswd -a user docker`
+
+`newgrp docker`
+
+4. And where done enjoy your new archNAS system!

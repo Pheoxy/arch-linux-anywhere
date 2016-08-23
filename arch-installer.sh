@@ -1567,9 +1567,7 @@ add_user() {
 
 	op_title="$user_op_msg"
 	if ! "$menu_enter" ; then
-		if ! (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$user_msg0" 10 60) then
-			graphics
-		fi
+		if ! (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$user_msg0" 10 60)
 	fi
 
 	user=$(dialog --nocancel --inputbox "\n$user_msg1" 12 55 "" 3>&1 1>&2 2>&3 | sed 's/ //g')
@@ -1612,8 +1610,6 @@ add_user() {
 
 	if "$menu_enter" ; then
 		reboot_system
-	else	
-		graphics
 	fi
 
 }
