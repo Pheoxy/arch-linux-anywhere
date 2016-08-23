@@ -1618,250 +1618,6 @@ add_user() {
 
 }
 
-graphics() {
-
-	op_title="$de_op_msg"
-	if ! "$menu_enter" ; then
-		if ! (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$desktop_msg" 10 60) then
-			if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$desktop_cancel_msg" 10 60) then	
-				install_software
-			fi	
-		fi
-	fi
-	
-	DE=$(dialog --ok-button "$ok" --cancel-button "$cancel" --menu "$enviornment_msg" 18 60 11 \
-		"cinnamon"      "$de5" \
-		"deepin"		"$de14" \
-		"gnome"         "$de4" \
-		"KDE plasma"    "$de6" \
-		"lxde"          "$de2" \
-		"lxqt"          "$de3" \
-		"mate"          "$de1" \
-		"xfce4"         "$de0" \
-		"awesome"       "$de9" \
-		"bspwm"			"$de13" \
-		"dwm"           "$de12" \
-		"enlightenment" "$de7" \
-		"fluxbox"       "$de11" \
-		"i3"            "$de10" \
-		"openbox"       "$de8" \
-		"xmonad"		"$de16"  3>&1 1>&2 2>&3)
-	if [ "$?" -gt "0" ]; then 
-		if ! "$menu_enter" ; then
-			if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$desktop_cancel_msg" 10 60) then	
-				install_software
-			fi
-		else
-			reboot_system
-		fi
-	fi
-
-	case "$DE" in
-		"xfce4") 	if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg0" 10 60) then
-						DE="xfce4 xfce4-goodies"
-					fi
-					start_term="exec startxfce4"
-		;;
-		"gnome")	if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg1" 10 60) then
-						DE="gnome gnome-extra"
-					fi
-					 start_term="exec gnome-session"
-		;;
-		"mate")		if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg2" 10 60) then
-						DE="mate mate-extra"
-					fi
-					 start_term="exec mate-session"
-		;;
-		"KDE plasma")	if (dialog --defaultno --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg3" 10 60) then
-							DE="kde-applications plasma-desktop"
-						else
-							DE="kde-applications plasma"
-						fi
-						
-						enable_dm=true
-						start_term="exec startkde"
-		;;
-		"deepin")	if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg4" 10 60) then
-						DE="deepin deepin-extra"
-					fi
- 					start_term="exec startdde"
- 		;;
- 		"xmonad")	if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg5" 10 60) then 
-                        DE="xmonad xmonad-contrib"
-                    fi
-                    start_term="exec xmonad"
-		;;	
-		"cinnamon") start_term="exec cinnamon-session" 
-		;;
-		"lxde") 	start_term="exec startlxde" 
-		;;
-		"lxqt") 	start_term="exec startlxqt" 
-					DE="lxqt oxygen-icons"
-		;;
-		"enlightenment") 	start_term="exec enlightenment_start"
-							DE="enlightenment terminology"
-		;;
-		"bspwm")	start_term="sxhkd & ; exec bspwm"
-					DE="bspwm sxhkd"
-		;;
-		"fluxbox")	start_term="exec startfluxbox" 
-		;;
-		"openbox")	start_term="exec openbox-session"
-		;;
-		"awesome") 	start_term="exec awesome" 
-		;;	
-		"dwm") 		start_term="exec dwm" 
-		;;
-		"i3") 		start_term="exec i3" 
-		;;
-	esac
-
-	env=$(<<<"$DE" awk '{print $1,$2}')
-
-	if ! $desktop ; then
-		while (true)
-		  do
-		  	if "$VBOX" ; then
-		  		dialog --ok-button "$ok" --msgbox "\n$vbox_msg" 10 60
-				GPU="virtualbox-guest-utils linux-headers mesa-libgl"
-		  		break
-		  	fi
-			GPU=$(dialog --ok-button "$ok" --cancel-button "$cancel" --menu "$graphics_msg" 16 60 5 \
-				"$default"			"$gr0" \
-				"mesa-libgl"        "$gr1" \
-				"Nvidia"            "$gr2" \
-				"xf86-video-ati"    "$gr4" \
-				"xf86-video-intel"  "$gr5" 3>&1 1>&2 2>&3)
-			if [ "$?" -gt "0" ]; then
-				if (dialog --yes-button "$yes" --no-button "$no" --yesno "$desktop_cancel_msg" 10 60) then
-					install_software
-				fi
-			elif [ "$GPU" == "Nvidia" ]; then
-				GPU=$(dialog --ok-button "$ok" --cancel-button "$cancel" --menu "$nvidia_msg" 15 60 4 \
-					"nvidia"       "$gr6" \
-					"nvidia-340xx" "$gr7" \
-					"nvidia-304xx" "$gr8" 3>&1 1>&2 2>&3)
-				if [ "$?" -eq "0" ]; then
-					GPU="$GPU ${GPU}-libgl"
-					break
-				fi
-			elif [ "$GPU" == "$default" ]; then
-				unset GPU
-				break
-			else
-				break
-			fi
-		done
-				
-		DE="$DE xorg-server xorg-server-utils xorg-xinit xterm $GPU"
-		
-		if [ "$net_util" == "networkmanager" ] ; then
-			DE="$DE network-manager-applet"
-		fi
-
-		if (dialog --defaultno --yes-button "$yes" --no-button "$no" --yesno "\n$touchpad_msg" 10 60) then
-			GPU="$DE xf86-input-synaptics"
-		fi
-
-		if "$enable_bt" ; then
-			if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$blueman_msg" 10 60) then
-				DE="$DE blueman"
-			fi
-		fi
-	fi
-	
-	if ! "$enable_dm" ; then
-		if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$lightdm_msg" 10 60) then
-			DE="$DE lightdm lightdm-gtk-greeter"
-			enable_dm=true
-		else
-			dialog --ok-button "$ok" --msgbox "\n$startx_msg" 10 60
-		fi
-	fi
-	
-	pacstrap "$ARCH" --print-format='%s' $(echo "$DE") | sed '1,6d' | awk '{s+=$1} END {print s/1024/1024}' &> /tmp/size.tmp &
-	pid=$! pri=0.1 msg="$wait_load \n\n \Z1> \Z2pacman -Sy\Zn" load
-	download_size=$(</tmp/size.tmp) ; rm /tmp/size.tmp
-	export software_size=$(echo "$download_size Mib")
-	cal_rate
-
-	if (dialog --yes-button "$install" --no-button "$cancel" --yesno "\n$desktop_confirm_var" 18 60) then
-		tmpfile=$(mktemp)
-		pacstrap "$ARCH" $(echo "$DE") &> "$tmpfile" &
-		pid=$! pri=$(<<<"$down" sed 's/\..*$//') msg="\n$desktop_load_var" load_log
-		rm "$tmpfile"
-		desktop=true
-
-		if "$enable_dm" ; then 
-			if ! "$dm_set" ; then
-				if (<<<"$DE" grep "kde" &> /dev/null); then
-					arch-chroot "$ARCH" systemctl enable sddm.service &> /dev/null &
-					pid=$! pri="0.1" msg="$wait_load \n\n \Z1> \Z2systemctl enable sddm\Zn" load
-					dm_set=true
-				else
-					arch-chroot "$ARCH" systemctl enable lightdm.service &> /dev/null &
-					pid=$! pri="0.1" msg="\n$dm_load \n\n \Z1> \Z2systemctl enable lightdm\Zn" load
-					dm_set=true
-				fi
-			fi
-		fi
-		
-		if "$VBOX" ; then
-			arch-chroot "$ARCH" systemctl enable vboxservice &>/dev/null &
-			pid=$! pri=0.1 msg="\n$vbox_enable_msg \n\n \Z1> \Z2systemctl enable vboxservice\Zn" load
-		fi
-		
-		if [ -n "$user" ]; then
-			echo "$start_term" > "$ARCH"/home/"$user"/.xinitrc
-		fi
-				
-		echo "$start_term" > "$ARCH"/etc/skel/.xinitrc
-		echo "$start_term" > "$ARCH"/root/.xinitrc
-	else
-		if ! "$menu_enter" ; then
-			if ! (dialog --yes-button "$yes" --no-button "$no" --defaultno --yesno "$desktop_cancel_msg" 10 60) then
-				de_config=false
-				graphics
-			fi
-		fi
-	fi
-
-	if "$menu_enter" ; then
-		reboot_system
-	fi
-
-	install_software
-
-}
-
-config_env() {
-
-	sh="/usr/bin/zsh"
-	
-	if [ -n "$user" ]; then
-		mkdir "$ARCH"/home/"$user"/.config &> /dev/null
-		arch-chroot "$ARCH" chsh -s /usr/bin/zsh "$user" &> /dev/null
-		cp /usr/share/arch-anywhere/.zshrc "$ARCH"/home/"$user"/
-		cp -r /usr/share/archNAS/desktop/.config/{xfce4,Thunar} "$ARCH"/home/"$user"/.config/
-		cp /usr/share/archNAS/desktop/archNAS-icon.png "$ARCH"/home/"$user"/.face
-		arch-chroot "$ARCH" /bin/bash -c "chown -R $user /home/$user"
-	fi
-
-	arch-chroot "$ARCH" chsh -s /usr/bin/zsh &> /dev/null
-	cp /usr/share/archNAS/.zshrc "$ARCH"/root/
-	mkdir "$ARCH"/root/.config/ &> /dev/null
-	cp -r /usr/share/archNAS/desktop/.config/{xfce4,Thunar} "$ARCH"/root/.config/
-	cp -r /usr/share/archNAS/{.zshrc,desktop/.config/} "$ARCH"/etc/skel/
-	cp /usr/share/archNAS/desktop/archNAS-icon.png "$ARCH"/etc/skel/.face
-	cp -r "/usr/share/archNAS/desktop/AshOS-Dark-2.0" "$ARCH"/usr/share/themes/
-	cp /usr/share/archNAS/desktop/archNAS-wallpaper.png "$ARCH"/usr/share/backgrounds/xfce/
-	cp "$ARCH"/usr/share/backgrounds/xfce/archNAS-wallpaper.png "$ARCH"/usr/share/backgrounds/xfce/xfce-teal.jpg
-	cp /usr/share/archNAS/desktop/archNAS-icon.png "$ARCH"/usr/share/pixmaps/
-	de_config=false
-
-
-}
-
 install_software() {
 
 	op_title="$software_op_msg"
@@ -1873,13 +1629,7 @@ install_software() {
 			err=false
 			if ! "$skip" ; then
 				software_menu=$(dialog --ok-button "$ok" --cancel-button "$cancel" --menu "$software_type_msg" 20 63 11 \
-					"$audio" "$audio_msg" \
-					"$games" "$games_msg" \
-					"$graphic" "$graphic_msg" \
 					"$internet" "$internet_msg" \
-					"$multimedia" "$multimedia_msg" \
-					"$office" "$office_msg" \
-					"$terminal" "$terminal_msg" \
 					"$text_editor" "$text_editor_msg" \
 					"$shell" "$shell_msg" \
 					"$system" "$system_msg" \
@@ -1899,36 +1649,9 @@ install_software() {
 			fi
 
 			case "$software_menu" in
-				"$audio")
-					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 20 60 10 \
-						"audacity"		"$audio0" OFF \
-						"audacious"		"$audio1" OFF \
-						"cmus"			"$audio2" OFF \
-						"jack2"         "$audio3" OFF \
-						"projectm"		"$audio4" OFF \
-						"lmms"			"$audio5" OFF \
-						"mpd"			"$audio6" OFF \
-						"ncmpcpp"		"$audio7" OFF \
-						"pianobar"		"$audio9" OFF \
-						"pulseaudio"	"$audio8" OFF 3>&1 1>&2 2>&3)
-					if [ "$?" -gt "0" ]; then
-						err=true
-					fi
-				;;
 				"$internet")
 					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 19 60 9 \
-						"chromium"			"$net0" OFF \
-						"elinks"			"$net3" OFF \
-						"filezilla"			"$net1" OFF \
-						"firefox"			"$net2" OFF \
-						"irssi"				"$net9" OFF \
-						"lynx"				"$net3" OFF \
-						"minitube"			"$net4" OFF \
-						"thunderbird"			"$net6" OFF \
-						"transmission-cli" 		"$net7" OFF \
-						"transmission-gtk"		"$net8" OFF \
-						"xchat"				"$net10" OFF \
-						"hexchat"			"$net11" OFF 3>&1 1>&2 2>&3)
+						"transmission-cli" 		"$net0" OFF 3>&1 1>&2 2>&3)
 					if [ "$?" -gt "0" ]; then
 						err=true
 					elif "$desktop" ; then
@@ -1937,84 +1660,9 @@ install_software() {
 						fi
 					fi
 				;;
-				"$games")
-					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 20 70 10 \
-						"alienarena"	"$game0" OFF \
-						"bsd-games"		"$game1" OFF \
-						"bzflag"		"$game2" OFF \
-						"flightgear"	"$game3" OFF \
-						"gnuchess"      "$game4" OFF \
-						"supertux"		"$game5" OFF \
-						"supertuxkart"	"$game6" OFF \
-						"urbanterror"	"$game7" OFF \
-						"warsow"		"$game8" OFF \
-						"xonotic"		"$game9" OFF 3>&1 1>&2 2>&3)
-					if [ "$?" -gt "0" ]; then
-						err=true
-					fi
-				;;
-				"$graphic")
-					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 17 63 7 \
-						"blender"		"$graphic0" OFF \
-						"darktable"		"$graphic1" OFF \
-						"feh"			"$graphic6" OFF \
-						"gimp"			"$graphic2" OFF \
-						"graphviz"		"$graphic3" OFF \
-						"imagemagick"	"$graphic4" OFF \
-						"pinta"			"$graphic5" OFF 3>&1 1>&2 2>&3)
-					if [ "$?" -gt "0" ]; then
-						err=true
-					fi
-				;;
-				"$multimedia")
-					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 17 63 7 \
-						"handbrake"				"$media0" OFF \
-						"mplayer"				"$media1" OFF \
-						"mpv"					"$media7" OFF \
-						"pitivi"				"$media2" OFF \
-						"simplescreenrecorder"	"$media3" OFF \
-						"smplayer"				"$media4" OFF \
-						"totem"					"$media5" OFF \
-						"vlc"         	   		"$media6" OFF 3>&1 1>&2 2>&3)
-					if [ "$?" -gt "0" ]; then
-						err=true
-					fi
-				;;
-				"$office")
-					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 16 63 6 \
-						"abiword"               "$office0" OFF \
-						"calligra"              "$office1" OFF \
-						"calligra-sheets"		"$office2" OFF \
-						"gnumeric"				"$office3" OFF \
-						"libreoffice-fresh"		"$office4" OFF \
-						"libreoffice-still"		"$office5" OFF 3>&1 1>&2 2>&3)
-					if [ "$?" -gt "0" ]; then
-						err=true
-					fi
-				;;
-				"$terminal")
-					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 18 63 8 \
-						"fbterm"			"$term0" OFF \
-						"guake"             "$term1" OFF \
-						"kmscon"			"$term2" OFF \
-						"pantheon-terminal"	"$term3" OFF \
-						"rxvt-unicode"      "$term4" OFF \
-						"terminator"        "$term5" OFF \
-						"xfce4-terminal"    "$term6" OFF \
-						"yakuake"           "$term7" OFF 3>&1 1>&2 2>&3)
-					if [ "$?" -gt "0" ]; then
-						err=true
-					fi
-				;;
 				"$text_editor")
 					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 17 60 7 \
-						"emacs"			"$edit0" OFF \
-						"geany"			"$edit1" OFF \
-						"gedit"			"$edit2" OFF \
-						"gvim"			"$edit3" OFF \
-						"mousepad"		"$edit4" OFF \
-						"neovim"		"$edit5" OFF \
-						"vim"			"$edit6" OFF 3>&1 1>&2 2>&3)
+						"vim"			"$edit0" OFF 3>&1 1>&2 2>&3)
 					if [ "$?" -gt "0" ]; then
 						err=true
 					fi
@@ -2034,27 +1682,15 @@ install_software() {
 					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 20 65 10 \
 						"arch-wiki"		"$sys0" ON \
 						"apache"		"$sys1" OFF \
-						"conky"			"$sys2" OFF \
-						"dmenu"			"$sys19" OFF \
-						"fetchmirrors"	"$sys22" ON \
-						"git"			"$sys3" OFF \
-						"gparted"		"$sys4" OFF \
-						"gpm"			"$sys5" OFF \
-						"htop"			"$sys6" OFF \
-						"inxi"			"$sys7" OFF \
-						"k3b"			"$sys8" OFF \
-						"nmap"			"$sys9" OFF \
-						"openssh"		"$sys10" OFF \
-						"pcmanfm"		"$sys21" OFF \
-						"ranger"		"$sys20" OFF \
-						"screen"		"$sys11" OFF \
-						"screenfetch"	"$sys12" ON \
-						"scrot"			"$sys13" OFF \
-						"tmux"			"$sys14" OFF \
-						"tuxcmd"		"$sys15" OFF \
-						"virtualbox"	"$sys16" OFF \
-						"ufw"			"$sys17" ON \
-						"wget"			"$sys18" ON 3>&1 1>&2 2>&3)
+						"fetchmirrors"	"$sys10" ON \
+						"git"			"$sys2" OFF \
+						"htop"			"$sys3" OFF \
+						"inxi"			"$sys4" OFF \
+						"nmap"			"$sys5" OFF \
+						"openssh"		"$sys6" OFF \
+						"ranger"		"$sys9" OFF \
+						"ufw"			"$sys7" ON \
+						"wget"			"$sys8" ON 3>&1 1>&2 2>&3)
 					if [ "$?" -gt "0" ]; then
 						err=true
 					fi
