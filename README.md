@@ -1,4 +1,6 @@
 Built for Personal Use Only
+
+https://github.com/Pheoxy/ArchNAS/raw/0.1/boot/archNAS-logo.png
 # archNAS
 
 archNAS is intended for high customizeabilty and use of the archlinux distro.
