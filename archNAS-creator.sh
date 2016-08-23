@@ -312,7 +312,7 @@ md5_sum=$(md5sum "$version" | awk '{print $1}')
 sha1_sum=$(sha1sum "$version" | awk '{print $1}')
 timestamp=$(timedatectl | grep "Universal" | awk '{print $4" "$5" "$6}')
 echo "Checksums generated. Saved to archNAS-checksums.txt"
-echo -e "- Arch Anywhere is licensed under GPL v2\n- Developer: Dylan Schacht (deadhead3492@gmail.com)\n- Webpage: http://arch-anywhere.org\n- ISO timestamp: $timestamp\n- $version Official Check Sums:\n\n* md5sum: $md5_sum\n* sha1sum: $sha1_sum" > arch-anywhere-checksums.txt
+echo -e "- Arch Anywhere is licensed under GPL v2\n- Developer: Dylan Schacht (deadhead3492@gmail.com)\n- Webpage: http://arch-anywhere.org\n- ISO timestamp: $timestamp\n- $version Official Check Sums:\n\n* md5sum: $md5_sum\n* sha1sum: $sha1_sum" > archNAS-checksums.txt
 echo
 echo "$version ISO generated successfully! Exiting ISO creator."
 echo
