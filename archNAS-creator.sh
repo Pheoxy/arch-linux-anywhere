@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the version here
-export version="archNAS_0.1-x64.iso"
+export version="archNAS_0.1-dual.iso"
 
 # Set the ISO label here
 export iso_label="archnas_0.1"
