@@ -15,11 +15,6 @@ http://arch-anywhere.org/
 
 ### Future Features:
 
-* WebUI:
-
-    ajenti <br />
-    webmin <br />
-
 * Containers
 
     Docker <br />
