@@ -32,7 +32,7 @@ fi
 
 alias help="cat ~/.help"
 alias start="cat /etc/issue"
-alias 1="arch-anywhere"
+alias 1="archNAS"
 alias 2="arch-wiki"
 alias 3="iptest"
 alias 4="sysinfo"

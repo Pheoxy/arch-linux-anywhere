@@ -44,18 +44,18 @@ init() {
 		"Swedish" "Svenska" 3>&1 1>&2 2>&3)
 
 	case "$ILANG" in
-		"English") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-english.conf ;;
-		"Chinese") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-chinese.conf ;;
-		"French") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-french.conf ;;
-		"German") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-german.conf ;;
-		"Greek") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-greek.conf ;;
-		"Indonesian") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-indonesia.conf ;;
-		"Portuguese") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-portuguese.conf ;;
-		"Portuguese-Brazilian") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-portuguese-br.conf ;;
-		"Romanian") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-romanian.conf ;;
-		"Russian") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-russian.conf ;;
-		"Spanish") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-spanish.conf ;;
-		"Swedish") export lang_file=/usr/share/arch-anywhere/lang/arch-installer-swedish.conf ;;
+		"English") export lang_file=/usr/share/archNAS/lang/arch-installer-english.conf ;;
+		"Chinese") export lang_file=/usr/share/archNAS/lang/arch-installer-chinese.conf ;;
+		"French") export lang_file=/usr/share/archNAS/lang/arch-installer-french.conf ;;
+		"German") export lang_file=/usr/share/archNAS/lang/arch-installer-german.conf ;;
+		"Greek") export lang_file=/usr/share/archNAS/lang/arch-installer-greek.conf ;;
+		"Indonesian") export lang_file=/usr/share/archNAS/lang/arch-installer-indonesia.conf ;;
+		"Portuguese") export lang_file=/usr/share/archNAS/lang/arch-installer-portuguese.conf ;;
+		"Portuguese-Brazilian") export lang_file=/usr/share/archNAS/lang/arch-installer-portuguese-br.conf ;;
+		"Romanian") export lang_file=/usr/share/archNAS/lang/arch-installer-romanian.conf ;;
+		"Russian") export lang_file=/usr/share/archNAS/lang/arch-installer-russian.conf ;;
+		"Spanish") export lang_file=/usr/share/archNAS/lang/arch-installer-spanish.conf ;;
+		"Swedish") export lang_file=/usr/share/archNAS/lang/arch-installer-swedish.conf ;;
 	esac
 
 	### Source configuration and language files
@@ -1370,9 +1370,9 @@ install_base() {
 		if [ $(</tmp/ex_status) -eq "0" ]; then
 			INSTALLED=true
 		else
-			mv "$tmpfile" /tmp/arch-anywhere.log
+			mv "$tmpfile" /tmp/archNAS.log
 			dialog --ok-button "$ok" --msgbox "\n$failed_msg" 10 60
-			reset ; tail /tmp/arch-anywhere.log ; exit 1
+			reset ; tail /tmp/archNAS.log ; exit 1
 		fi
 		
 		if "$enable_f2fs" && ! "$crypted" && ! "$UEFI" ; then
@@ -1444,8 +1444,8 @@ syslinux_config() {
 		esp_mnt=$(<<<$esp_mnt sed "s!$ARCH!!")
 		(mkdir -p ${ARCH}${esp_mnt}/EFI/syslinux
 		cp -r "$ARCH"/usr/lib/syslinux/efi64/* ${ARCH}${esp_mnt}/EFI/syslinux/
-		cp /usr/share/arch-anywhere/syslinux/syslinux_efi.cfg ${ARCH}${esp_mnt}/EFI/syslinux/syslinux.cfg
-		cp /usr/share/arch-anywhere/syslinux/splash.png ${ARCH}${esp_mnt}/EFI/syslinux
+		cp /usr/share/archNAS/syslinux/syslinux_efi.cfg ${ARCH}${esp_mnt}/EFI/syslinux/syslinux.cfg
+		cp /usr/share/archNAS/syslinux/splash.png ${ARCH}${esp_mnt}/EFI/syslinux
 		arch-chroot "$ARCH" efibootmgr -c -d /dev/"$esp_part" -p "$esp_part_int" -l /EFI/syslinux/syslinux.efi -L "Syslinux") &> /dev/null &
 		pid=$! pri=0.1 msg="\n$syslinux_load \n\n \Z1> \Z2syslinux install efi mode...\Zn" load
 		
@@ -1458,7 +1458,7 @@ syslinux_config() {
 	else
 		(syslinux-install_update -i -a -m -c "$ARCH"
 		cp "$ARCH"/usr/lib/syslinux/bios/vesamenu.c32 "$ARCH"/boot/syslinux/
-		cp /usr/share/arch-anywhere/syslinux/{syslinux.cfg,splash.png} "$ARCH"/boot/syslinux) &> /dev/null &
+		cp /usr/share/archNAS/syslinux/{syslinux.cfg,splash.png} "$ARCH"/boot/syslinux) &> /dev/null &
 		pid=$! pri=0.1 msg="\n$syslinux_load \n\n \Z1> \Z2syslinux-install_update -i -a -m -c $ARCH\Zn" load
 	fi
 
@@ -1530,7 +1530,7 @@ configure_system() {
 set_hostname() {
 
 	op_title="$host_op_msg"
-	hostname=$(dialog --ok-button "$ok" --nocancel --inputbox "\n$host_msg" 12 55 "arch-anywhere" 3>&1 1>&2 2>&3 | sed 's/ //g')
+	hostname=$(dialog --ok-button "$ok" --nocancel --inputbox "\n$host_msg" 12 55 "archNAS" 3>&1 1>&2 2>&3 | sed 's/ //g')
 	
 	if (<<<$hostname grep "^[0-9]\|[\[\$\!\'\"\`\\|%&#@()+=<>~;:/?.,^{}]\|]" &> /dev/null); then
 		dialog --ok-button "$ok" --msgbox "\n$host_err_msg" 10 60
@@ -1538,8 +1538,8 @@ set_hostname() {
 	fi
 	
 	echo "$hostname" > "$ARCH"/etc/hostname
-	cp /usr/share/arch-anywhere/.bashrc-root "$ARCH"/root/.bashrc
-	cp /usr/share/arch-anywhere/.bashrc "$ARCH"/etc/skel/
+	cp /usr/share/archNAS/.bashrc-root "$ARCH"/root/.bashrc
+	cp /usr/share/archNAS/.bashrc "$ARCH"/etc/skel/
 
 	op_title="$passwd_op_msg"
 	while [ "$input" != "$input_chk" ]
@@ -1630,7 +1630,6 @@ graphics() {
 	fi
 	
 	DE=$(dialog --ok-button "$ok" --cancel-button "$cancel" --menu "$enviornment_msg" 18 60 11 \
-		"Arch-Anywhere-Xfce" "$de15" \
 		"cinnamon"      "$de5" \
 		"deepin"		"$de14" \
 		"gnome"         "$de4" \
@@ -1658,9 +1657,6 @@ graphics() {
 	fi
 
 	case "$DE" in
-		"Arch-Anywhere-Xfce") 	DE="xfce4 xfce4-goodies xdg-user-dirs gvfs zsh zsh-syntax-highlighting"
-								start_term="exec startxfce4" de_config=true
-		;;
 		"xfce4") 	if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg0" 10 60) then
 						DE="xfce4 xfce4-goodies"
 					fi
@@ -1814,11 +1810,6 @@ graphics() {
 			arch-chroot "$ARCH" systemctl enable vboxservice &>/dev/null &
 			pid=$! pri=0.1 msg="\n$vbox_enable_msg \n\n \Z1> \Z2systemctl enable vboxservice\Zn" load
 		fi
-
-		if "$de_config" ; then	
-			config_env &
-			pid=$! pri="0.1" msg="$wait_load \n\n \Z1> \Z2arch-anywhere config_env\Zn" load
-		fi
 		
 		if [ -n "$user" ]; then
 			echo "$start_term" > "$ARCH"/home/"$user"/.xinitrc
@@ -1851,21 +1842,21 @@ config_env() {
 		mkdir "$ARCH"/home/"$user"/.config &> /dev/null
 		arch-chroot "$ARCH" chsh -s /usr/bin/zsh "$user" &> /dev/null
 		cp /usr/share/arch-anywhere/.zshrc "$ARCH"/home/"$user"/
-		cp -r /usr/share/arch-anywhere/desktop/.config/{xfce4,Thunar} "$ARCH"/home/"$user"/.config/
-		cp /usr/share/arch-anywhere/desktop/arch-anywhere-icon.png "$ARCH"/home/"$user"/.face
+		cp -r /usr/share/archNAS/desktop/.config/{xfce4,Thunar} "$ARCH"/home/"$user"/.config/
+		cp /usr/share/archNAS/desktop/archNAS-icon.png "$ARCH"/home/"$user"/.face
 		arch-chroot "$ARCH" /bin/bash -c "chown -R $user /home/$user"
 	fi
 
 	arch-chroot "$ARCH" chsh -s /usr/bin/zsh &> /dev/null
-	cp /usr/share/arch-anywhere/.zshrc "$ARCH"/root/
+	cp /usr/share/archNAS/.zshrc "$ARCH"/root/
 	mkdir "$ARCH"/root/.config/ &> /dev/null
-	cp -r /usr/share/arch-anywhere/desktop/.config/{xfce4,Thunar} "$ARCH"/root/.config/
-	cp -r /usr/share/arch-anywhere/{.zshrc,desktop/.config/} "$ARCH"/etc/skel/
-	cp /usr/share/arch-anywhere/desktop/arch-anywhere-icon.png "$ARCH"/etc/skel/.face
-	cp -r "/usr/share/arch-anywhere/desktop/AshOS-Dark-2.0" "$ARCH"/usr/share/themes/
-	cp /usr/share/arch-anywhere/desktop/arch-anywhere-wallpaper.png "$ARCH"/usr/share/backgrounds/xfce/
-	cp "$ARCH"/usr/share/backgrounds/xfce/arch-anywhere-wallpaper.png "$ARCH"/usr/share/backgrounds/xfce/xfce-teal.jpg
-	cp /usr/share/arch-anywhere/desktop/arch-anywhere-icon.png "$ARCH"/usr/share/pixmaps/
+	cp -r /usr/share/archNAS/desktop/.config/{xfce4,Thunar} "$ARCH"/root/.config/
+	cp -r /usr/share/archNAS/{.zshrc,desktop/.config/} "$ARCH"/etc/skel/
+	cp /usr/share/archNAS/desktop/archNAS-icon.png "$ARCH"/etc/skel/.face
+	cp -r "/usr/share/archNAS/desktop/AshOS-Dark-2.0" "$ARCH"/usr/share/themes/
+	cp /usr/share/archNAS/desktop/archNAS-wallpaper.png "$ARCH"/usr/share/backgrounds/xfce/
+	cp "$ARCH"/usr/share/backgrounds/xfce/archNAS-wallpaper.png "$ARCH"/usr/share/backgrounds/xfce/xfce-teal.jpg
+	cp /usr/share/archNAS/desktop/archNAS-icon.png "$ARCH"/usr/share/pixmaps/
 	de_config=false
 
 
@@ -2069,16 +2060,16 @@ install_software() {
 					fi
 
 					if (<<<$software grep "arch-wiki" &> /dev/null); then
-						pkg=$(ls /usr/share/arch-anywhere/pkg | grep arch-wiki)
-						cp /usr/share/arch-anywhere/pkg/"$pkg" "$ARCH"/var/cache/pacman/pkg
+						pkg=$(ls /usr/share/archNAS/pkg | grep arch-wiki)
+						cp /usr/share/archNAS/pkg/"$pkg" "$ARCH"/var/cache/pacman/pkg
 						arch-chroot "$ARCH" pacman -U --noconfirm /var/cache/pacman/pkg/"$pkg" &> /dev/null &
 						pid=$! pri=0.1 msg="\nInstalling arch-wiki... \n\n \Z1> \Z2pacman -U $pkg\Zn" load
 						software=$(<<<$software sed 's/arch-wiki//')
 					fi
 
 					if (<<<$software grep "fetchmirrors" &> /dev/null); then
-						pkg="$(ls /usr/share/arch-anywhere/pkg | grep fetchmirrors)"
-						cp /usr/share/arch-anywhere/pkg/"$pkg" "$ARCH"/var/cache/pacman/pkg
+						pkg="$(ls /usr/share/archNAS/pkg | grep fetchmirrors)"
+						cp /usr/share/archNAS/pkg/"$pkg" "$ARCH"/var/cache/pacman/pkg
 						arch-chroot "$ARCH" pacman -U --noconfirm /var/cache/pacman/pkg/"$pkg" &> /dev/null &
 						pid=$! pri=0.1 msg="\nInstalling fetchmirrors... \n\n \Z1> \Z2pacman -U $pkg\Zn" load
 						software=$(<<<$software sed 's/fetchmirrors//')
@@ -2287,7 +2278,7 @@ main_menu() {
 						fi
 					fi
 		;;
-		"$menu13")	echo -e "alias arch-anywhere=exit ; echo -e '$return_msg'" > /tmp/.zshrc
+		"$menu13")	echo -e "alias archNAS=exit ; echo -e '$return_msg'" > /tmp/.zshrc
 					clear
 					ZDOTDIR=/tmp/ zsh
 					rm /tmp/.zshrc
@@ -2355,7 +2346,7 @@ arch_anywhere_chroot() {
         	fi  
 		done
     	
-		if [ "$input" == "arch-anywhere" ] || [ "$input" == "exit" ]; then
+		if [ "$input" == "archNAS" ] || [ "$input" == "exit" ]; then
         	rm /tmp/chroot_dir.var &> /dev/null
 			clear
 			break
