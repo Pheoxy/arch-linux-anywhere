@@ -37,9 +37,9 @@ http://arch-anywhere.org/
 
 ### Install:
 
-1. Go through the installer and install archNAS.
+Go through the installer and install archNAS.
 
-2. Once you have booted login as `root` and enter these commands to install <b>cockpit</b>.
+Once you have booted login as `root` and enter these commands to install <b>cockpit</b>.
 
 `cd /tmp`
 
@@ -65,7 +65,7 @@ You can access cockpit WebUI at:
 
 `https://ip-address-of-machine:9090`
 
-3. Now we need to install <b>docker</b>
+Now we need to install <b>docker</b>
 
 `pacman -S docker`
 
@@ -81,4 +81,4 @@ If you want to be able to run docker as a regular user, add yourself to the dock
 
 `newgrp docker`
 
-4. And where done enjoy your new archNAS system!
+And where done enjoy your new archNAS system!

@@ -174,7 +174,7 @@ prepare_x86_64() {
 	sudo cp "$aa"/extra/.bashrc-root "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS
 #	sudo mkdir "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
 #	sudo mv /tmp/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
-	sudo cp -r "$aa"/extra/desktop "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
+#	sudo cp -r "$aa"/extra/desktop "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
 	sudo cp "$aa"/boot/issue "$customiso"/arch/x86_64/squashfs-root/etc/
 	sudo cp "$aa"/boot/hostname "$customiso"/arch/x86_64/squashfs-root/etc/
 	sudo cp -r "$aa"/boot/loader/syslinux "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
@@ -231,7 +231,7 @@ prepare_i686() {
 	sudo cp "$aa"/extra/.bashrc "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
 	sudo cp "$aa"/extra/.zshrc "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
 	sudo cp "$aa"/extra/.bashrc-root "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
-	sudo cp -r "$aa"/extra/desktop "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
+#	sudo cp -r "$aa"/extra/desktop "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
 	sudo cp "$aa"/boot/issue "$customiso"/arch/i686/squashfs-root/etc/
 	sudo cp "$aa"/boot/hostname "$customiso"/arch/i686/squashfs-root/etc/
 	sudo cp -r "$aa"/boot/loader/syslinux "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
