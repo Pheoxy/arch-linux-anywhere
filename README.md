@@ -1,4 +1,4 @@
-Built for Personal Use Only
+Built for PERSONAL USE ONLY!
 
 ![archNAS-logo](https://github.com/Pheoxy/ArchNAS/raw/0.1/boot/archNAS-logo.png)
 # archNAS
