@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set date
-NOW=$(date +"%Y_%m_%d")
+NOW=$(date +"%Y.%m.%d")
 
 # Set the version here
 export version="archNAS_0.1-$NOW-dual.iso"
