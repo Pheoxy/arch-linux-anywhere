@@ -34,3 +34,6 @@ http://arch-anywhere.org/
 * Terminal
 
     SSH/SFTP <br />
+
+
+#### To install follow the [Wiki](https://github.com/Pheoxy/archNAS/wiki)
