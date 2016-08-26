@@ -1,24 +1,24 @@
 #!/bin/bash
 
 # Set date
-NOW=$(date +"%Y_%m_%d")
+date=$(date +"%Y_%m_%d")
 
 # Set the version here
-export version="archNAS_0.1-$NOW-dual.iso"
+export version="archNAS-$date-dual.iso"
 
 # Set the ISO label here
-export iso_label="archnas_0.1"
+export iso_label="archnas"
 
 # Location variables all directories must exist
-export aa=~/archNAS
+export aN=~/archNAS
 export customiso=~/archNAS/customiso
 export mntdir=~/archNAS/mnt
 
-# Link to the iso used to create Arch Anywhere
+# Link to the iso used to create archNAS
 export archiso_link="http://arch.localmsp.org/arch/iso/2016.08.01/archlinux-2016.08.01-dual.iso"
 
 init() {
-	
+
 	if [ -d "$customiso" ]; then
 		sudo rm -rf "$customiso"
 	fi
@@ -26,20 +26,20 @@ init() {
 	if [ ! -d "$mntdir" ]; then
 		mkdir "$mntdir"
 	fi
-	
+
 	if [ -d "$mntdir"/arch ]; then
 		cp -a "$mntdir" "$customiso"
 	else
 		mounted=false
 		echo -n "ISO not mounted would you like to mount it now? [y/n]: "
 		read input
-		
+
 		until "$mounted"
 		  do
 			case "$input" in
 				y|Y|yes|Yes|yY|Yy|yy|YY)
-					if [ -f "$aa"/archlinux-*.iso ]; then
-						sudo mount -t iso9660 -o loop "$aa"/archlinux-*.iso "$mntdir"
+					if [ -f "$aN"/archlinux-*.iso ]; then
+						sudo mount -t iso9660 -o loop "$aN"/archlinux-*.iso "$mntdir"
 						if [ "$?" -eq "0" ]; then
 							mounted=true
 						else
@@ -49,12 +49,12 @@ init() {
 						cp -a "$mntdir" "$customiso"
 					else
 						echo
-						echo -n "No archiso found under $aa would you like to download now? [y/N]"
+						echo -n "No archiso found under $aN would you like to download now? [y/N]"
 						read input
-    
+
 						case "$input" in
 							y|Y|yes|Yes|yY|Yy|yy|YY)
-								cd "$aa"
+								cd "$aN"
 								wget "$archiso_link"
 								if [ "$?" -gt "0" ]; then
 									echo "Error: requires wget, exiting"
@@ -62,7 +62,7 @@ init() {
 								fi
 							;;
 							n|N|no|No|nN|Nn|nn|NN)
-								echo "Error: Creating the ISO requires the official archiso to be located at $aa, exiting."
+								echo "Error: Creating the ISO requires the official archiso to be located at $aN, exiting."
 								exit 1
 							;;
 						esac
@@ -124,9 +124,9 @@ builds() {
 	if [ ! -d /tmp/arch-wiki-cli ]; then
 		### Build arch-wiki
 		cd /tmp
-		wget "https://aur.archlinux.org/cgit/aur.git/snapshot/arch-wiki-cli.tar.gz"
-		tar -xf arch-wiki-cli.tar.gz
-		cd arch-wiki-cli
+		wget "https://aur.archlinux.org/cgit/aur.git/snapshot/arch-wiki-lite.tar.gz"
+		tar -xf arch-wiki-lite.tar.gz
+		cd arch-wiki-lite
 		makepkg -s
 	fi
 	prepare_x86_64
@@ -134,55 +134,55 @@ builds() {
 }
 
 prepare_x86_64() {
-	
+
 ### Change directory into the ISO where the filesystem is stored.
 ### Unsquash root filesystem 'airootfs.sfs' this creates a directory 'squashfs-root' containing the entire system
 	echo "Preparing x86_64..."
 	cd "$customiso"/arch/x86_64
 	sudo unsquashfs airootfs.sfs
-	
+
 ### Install fonts onto system and cleanup
 	sudo pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf --noconfirm -Syyy terminus-font
 	sudo pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf -Sl | awk '/\[installed\]$/ {print $1 "/" $2 "-" $3}' > "$customiso"/arch/pkglist.x86_64.txt
 	sudo pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf --noconfirm -Scc
 	sudo rm -f "$customiso"/arch/x86_64/squashfs-root/var/cache/pacman/pkg/*
-	
+
 ### Copy over vconsole.conf (sets font at boot) & locale.gen (enables locale(s) for font)
-	sudo cp "$aa"/etc/vconsole.conf "$customiso"/arch/x86_64/squashfs-root/etc
-	sudo cp "$aa"/etc/locale.gen "$customiso"/arch/x86_64/squashfs-root/etc
+	sudo cp "$aN"/etc/vconsole.conf "$customiso"/arch/x86_64/squashfs-root/etc
+	sudo cp "$aN"/etc/locale.gen "$customiso"/arch/x86_64/squashfs-root/etc
 	sudo arch-chroot squashfs-root /bin/bash locale-gen
-	
+
 ### Copy over main arch anywhere config, installer script, and arch-wiki,  make executeable
-	sudo cp "$aa"/etc/archNAS.conf "$customiso"/arch/x86_64/squashfs-root/etc/
-#	sudo cp "$aa"/etc/archNAS.service "$customiso"/arch/x86_64/squashfs-root/usr/lib/systemd/system/
-#	sudo cp "$aa"/archNAS-init.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS-init
-	sudo cp "$aa"/arch-installer.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS
-	sudo cp "$aa"/extra/arch-wiki "$customiso"/arch/x86_64/squashfs-root/usr/bin/arch-wiki
-	sudo cp "$aa"/extra/fetchmirrors "$customiso"/arch/x86_64/squashfs-root/usr/bin/fetchmirrors
-	sudo cp "$aa"/extra/sysinfo "$customiso"/arch/x86_64/squashfs-root/usr/bin/sysinfo
-	sudo cp "$aa"/extra/iptest "$customiso"/arch/x86_64/squashfs-root/usr/bin/iptest
+	sudo cp "$aN"/etc/archNAS.conf "$customiso"/arch/x86_64/squashfs-root/etc/
+#	sudo cp "$aN"/etc/archNAS.service "$customiso"/arch/x86_64/squashfs-root/usr/lib/systemd/system/
+#	sudo cp "$aN"/archNAS-init.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS-init
+	sudo cp "$aN"/archNAS.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS
+#	sudo cp "$aN"/extra/arch-wiki "$customiso"/arch/x86_64/squashfs-root/usr/bin/arch-wiki
+	sudo cp "$aN"/extra/fetchmirrors "$customiso"/arch/x86_64/squashfs-root/usr/bin/fetchmirrors
+	sudo cp "$aN"/extra/sysinfo "$customiso"/arch/x86_64/squashfs-root/usr/bin/sysinfo
+	sudo cp "$aN"/extra/iptest "$customiso"/arch/x86_64/squashfs-root/usr/bin/iptest
 	sudo chmod +x "$customiso"/arch/x86_64/squashfs-root/usr/bin/{archNAS,arch-wiki,fetchmirrors,sysinfo,iptest}
 #	sudo arch-chroot "$customiso"/arch/x86_64/squashfs-root /bin/bash -c "systemctl enable archNAS.service"
 
 ### Create archNAS directory and lang directory copy over all lang files
 	sudo mkdir -p "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/{lang,pkg}
-	sudo cp "$aa"/lang/* "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/lang
+	sudo cp "$aN"/lang/* "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/lang
 	sudo cp /tmp/fetchmirrors/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
-	sudo cp /tmp/arch-wiki-cli/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
+	sudo cp /tmp/arch-wiki-lite/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
 
 ### Copy over extra files (dot files, desktop configurations, help file, issue file, hostname file)
-	sudo cp "$aa"/extra/{.zshrc,.help,.dialogrc} "$customiso"/arch/x86_64/squashfs-root/root/
-	sudo cp "$aa"/extra/.bashrc "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS
-	sudo cp "$aa"/extra/.zshrc-sys "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/.zshrc
-	sudo cp "$aa"/extra/.bashrc-root "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS
+	sudo cp "$aN"/extra/{.zshrc,.help,.dialogrc} "$customiso"/arch/x86_64/squashfs-root/root/
+	sudo cp "$aN"/extra/.bashrc "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS
+	sudo cp "$aN"/extra/.zshrc-sys "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/.zshrc
+	sudo cp "$aN"/extra/.bashrc-root "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS
 #	sudo mkdir "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
 #	sudo mv /tmp/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
-#	sudo cp -r "$aa"/extra/desktop "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
-	sudo cp "$aa"/boot/issue "$customiso"/arch/x86_64/squashfs-root/etc/
-	sudo cp "$aa"/boot/hostname "$customiso"/arch/x86_64/squashfs-root/etc/
-	sudo cp -r "$aa"/boot/loader/syslinux "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
-	sudo cp "$aa"/boot/splash.png "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/syslinux
-	
+#	sudo cp -r "$aN"/extra/desktop "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
+	sudo cp "$aN"/boot/issue "$customiso"/arch/x86_64/squashfs-root/etc/
+	sudo cp "$aN"/boot/hostname "$customiso"/arch/x86_64/squashfs-root/etc/
+	sudo cp -r "$aN"/boot/loader/syslinux "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/
+	sudo cp "$aN"/boot/splash.png "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/syslinux
+
 ### cd back into root system directory, remove old system
 	cd "$customiso"/arch/x86_64
 	rm airootfs.sfs
@@ -197,48 +197,48 @@ prepare_x86_64() {
 }
 
 prepare_i686() {
-	
+
 	echo "Preparing i686..."
 	cd "$customiso"/arch/i686
 	sudo unsquashfs airootfs.sfs
 	sudo sed -i 's/\$arch/i686/g' squashfs-root/etc/pacman.d/mirrorlist
 	sudo sed -i 's/auto/i686/' squashfs-root/etc/pacman.conf
-	sudo setarch i686 pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf --noconfirm -Syyy terminus-font 
+	sudo setarch i686 pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf --noconfirm -Syyy terminus-font
 	sudo setarch i686 pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf -Sl | awk '/\[installed\]$/ {print $1 "/" $2 "-" $3}' > "$customiso"/arch/pkglist.i686.txt
 	sudo setarch i686 pacman --root squashfs-root --cachedir squashfs-root/var/cache/pacman/pkg  --config squashfs-root/etc/pacman.conf --noconfirm -Scc
 	sudo rm -f "$customiso"/arch/i686/squashfs-root//var/cache/pacman/pkg/*
-#	sudo cp "$aa"/etc/archNAS.service "$customiso"/arch/i686/squashfs-root/etc/systemd/system/
-#	sudo cp "$aa"/archNAS-init.sh "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS-init
-	sudo cp "$aa"/etc/archNAS.conf "$customiso"/arch/i686/squashfs-root/etc/
-	sudo cp "$aa"/etc/locale.gen "$customiso"/arch/i686/squashfs-root/etc
+#	sudo cp "$aN"/etc/archNAS.service "$customiso"/arch/i686/squashfs-root/etc/systemd/system/
+#	sudo cp "$aN"/archNAS-init.sh "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS-init
+	sudo cp "$aN"/etc/archNAS.conf "$customiso"/arch/i686/squashfs-root/etc/
+	sudo cp "$aN"/etc/locale.gen "$customiso"/arch/i686/squashfs-root/etc
 	sudo arch-chroot squashfs-root /bin/bash locale-gen
-	sudo cp "$aa"/etc/vconsole.conf "$customiso"/arch/i686/squashfs-root/etc
-	sudo cp "$aa"/arch-installer.sh "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS
+	sudo cp "$aN"/etc/vconsole.conf "$customiso"/arch/i686/squashfs-root/etc
+	sudo cp "$aN"/archNAS.sh "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS
 	sudo mkdir "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
 	sudo mkdir "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/{lang,pkg}
-	sudo cp "$aa"/lang/* "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/lang
+	sudo cp "$aN"/lang/* "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/lang
 	sudo cp /tmp/fetchmirrors/*.pkg.tar.xz "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/pkg
 	sudo cp /tmp/arch-wiki-cli/*.pkg.tar.xz "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/pkg
 	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS
-	sudo cp "$aa"/extra/arch-wiki "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
-	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki	
-	sudo cp "$aa"/extra/fetchmirrors "$customiso"/arch/i686/squashfs-root/usr/bin/fetchmirrors
+	sudo cp "$aN"/extra/arch-wiki "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
+	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
+	sudo cp "$aN"/extra/fetchmirrors "$customiso"/arch/i686/squashfs-root/usr/bin/fetchmirrors
 	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/fetchmirrors
-	sudo cp "$aa"/extra/sysinfo "$customiso"/arch/i686/squashfs-root/usr/bin/sysinfo
+	sudo cp "$aN"/extra/sysinfo "$customiso"/arch/i686/squashfs-root/usr/bin/sysinfo
 	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/sysinfo
-	sudo cp "$aa"/extra/iptest "$customiso"/arch/i686/squashfs-root/usr/bin/iptest
+	sudo cp "$aN"/extra/iptest "$customiso"/arch/i686/squashfs-root/usr/bin/iptest
 	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/iptest
 #	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS-init
 #	sudo arch-chroot "$customiso"/arch/i686/squashfs-root /bin/bash -c "systemctl enable archNAS.service"
-	sudo cp "$aa"/extra/{.zshrc,.help,.dialogrc} "$customiso"/arch/i686/squashfs-root/root/
-	sudo cp "$aa"/extra/.bashrc "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
-	sudo cp "$aa"/extra/.zshrc "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
-	sudo cp "$aa"/extra/.bashrc-root "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
-#	sudo cp -r "$aa"/extra/desktop "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
-	sudo cp "$aa"/boot/issue "$customiso"/arch/i686/squashfs-root/etc/
-	sudo cp "$aa"/boot/hostname "$customiso"/arch/i686/squashfs-root/etc/
-	sudo cp -r "$aa"/boot/loader/syslinux "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
-	sudo cp "$aa"/boot/splash.png "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/syslinux
+	sudo cp "$aN"/extra/{.zshrc,.help,.dialogrc} "$customiso"/arch/i686/squashfs-root/root/
+	sudo cp "$aN"/extra/.bashrc "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
+	sudo cp "$aN"/extra/.zshrc "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
+	sudo cp "$aN"/extra/.bashrc-root "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
+#	sudo cp -r "$aN"/extra/desktop "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
+	sudo cp "$aN"/boot/issue "$customiso"/arch/i686/squashfs-root/etc/
+	sudo cp "$aN"/boot/hostname "$customiso"/arch/i686/squashfs-root/etc/
+	sudo cp -r "$aN"/boot/loader/syslinux "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/
+	sudo cp "$aN"/boot/splash.png "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/syslinux
 	cd "$customiso"/arch/i686
 	rm airootfs.sfs
 	echo "Recreating i686..."
@@ -250,28 +250,28 @@ prepare_i686() {
 }
 
 configure_boot() {
-	
+
 	sudo mkdir "$customiso"/EFI/archiso/mnt
 	sudo mount -o loop "$customiso"/EFI/archiso/efiboot.img "$customiso"/EFI/archiso/mnt
-	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aa"/boot/iso/archiso-x86_64.CD.conf
-	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aa"/boot/iso/archiso-x86_64.conf
-	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aa"/boot/iso/archiso_sys64.cfg 
-	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aa"/boot/iso/archiso_sys32.cfg
-	sudo cp "$aa"/boot/iso/archiso-x86_64.CD.conf "$customiso"/EFI/archiso/mnt/loader/entries/archiso-x86_64.conf
+	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aN"/boot/iso/archiso-x86_64.CD.conf
+	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aN"/boot/iso/archiso-x86_64.conf
+	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aN"/boot/iso/archiso_sys64.cfg
+	sed -i "s/archisolabel=.*/archisolabel=$iso_label/" "$aN"/boot/iso/archiso_sys32.cfg
+	sudo cp "$aN"/boot/iso/archiso-x86_64.CD.conf "$customiso"/EFI/archiso/mnt/loader/entries/archiso-x86_64.conf
 	sudo umount "$customiso"/EFI/archiso/mnt
 	sudo rmdir "$customiso"/EFI/archiso/mnt
-	cp "$aa"/boot/iso/archiso-x86_64.conf "$customiso"/loader/entries/
-	cp "$aa"/boot/splash.png "$customiso"/arch/boot/syslinux
-	cp "$aa"/boot/iso/archiso_head.cfg "$customiso"/arch/boot/syslinux
-	cp "$aa"/boot/iso/archiso_sys64.cfg "$customiso"/arch/boot/syslinux
-	cp "$aa"/boot/iso/archiso_sys32.cfg "$customiso"/arch/boot/syslinux
+	cp "$aN"/boot/iso/archiso-x86_64.conf "$customiso"/loader/entries/
+	cp "$aN"/boot/splash.png "$customiso"/arch/boot/syslinux
+	cp "$aN"/boot/iso/archiso_head.cfg "$customiso"/arch/boot/syslinux
+	cp "$aN"/boot/iso/archiso_sys64.cfg "$customiso"/arch/boot/syslinux
+	cp "$aN"/boot/iso/archiso_sys32.cfg "$customiso"/arch/boot/syslinux
 	create_iso
 
 }
 
 create_iso() {
 
-	cd "$aa"
+	cd "$aN"
 	xorriso -as mkisofs \
 	 -iso-level 3 \
 	-full-iso9660-filenames \
