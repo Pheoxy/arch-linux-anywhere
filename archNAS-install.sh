@@ -30,32 +30,10 @@ init() {
 	source /etc/archNAS.conf
 	op_title=" -| Language Select |- "
 	ILANG=$(dialog --nocancel --menu "\archNAS Installer\n\n \Z2*\Zn Select your install language:" 20 60 10 \
-		"English" "-" \
-		"Chinese" "Chinese" \
-		"French" "Français" \
-		"German" "Deutsch" \
-		"Greek" "Greek" \
-		"Indonesian" "bahasa Indonesia" \
-		"Portuguese" "Português" \
-		"Portuguese-Brazilian" "Português do Brasil" \
-		"Romanian" "Română" \
-		"Russian" "Russian" \
-		"Spanish" "Español" \
-		"Swedish" "Svenska" 3>&1 1>&2 2>&3)
+		"English" "-" 3>&1 1>&2 2>&3)
 
 	case "$ILANG" in
 		"English") export lang_file=/usr/share/archNAS/lang/arch-installer-english.conf ;;
-		"Chinese") export lang_file=/usr/share/archNAS/lang/arch-installer-chinese.conf ;;
-		"French") export lang_file=/usr/share/archNAS/lang/arch-installer-french.conf ;;
-		"German") export lang_file=/usr/share/archNAS/lang/arch-installer-german.conf ;;
-		"Greek") export lang_file=/usr/share/archNAS/lang/arch-installer-greek.conf ;;
-		"Indonesian") export lang_file=/usr/share/archNAS/lang/arch-installer-indonesia.conf ;;
-		"Portuguese") export lang_file=/usr/share/archNAS/lang/arch-installer-portuguese.conf ;;
-		"Portuguese-Brazilian") export lang_file=/usr/share/archNAS/lang/arch-installer-portuguese-br.conf ;;
-		"Romanian") export lang_file=/usr/share/archNAS/lang/arch-installer-romanian.conf ;;
-		"Russian") export lang_file=/usr/share/archNAS/lang/arch-installer-russian.conf ;;
-		"Spanish") export lang_file=/usr/share/archNAS/lang/arch-installer-spanish.conf ;;
-		"Swedish") export lang_file=/usr/share/archNAS/lang/arch-installer-swedish.conf ;;
 	esac
 
 	### Source configuration and language files
@@ -1676,17 +1654,10 @@ install_software() {
 				;;
 				"$system")
 					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 20 65 10 \
-						"arch-wiki"		"$sys0" ON \
-						"apache"		"$sys1" OFF \
-						"fetchmirrors"	"$sys10" ON \
-						"git"			"$sys2" OFF \
-						"htop"			"$sys3" OFF \
-						"inxi"			"$sys4" OFF \
-						"nmap"			"$sys5" OFF \
-						"openssh"		"$sys6" OFF \
-						"ranger"		"$sys9" OFF \
-						"ufw"			"$sys7" ON \
-						"wget"			"$sys8" ON 3>&1 1>&2 2>&3)
+						"arch-wiki"		"$sys0" OFF \
+						"fetchmirrors"	"$sys3" ON \
+						"git"			"$sys1" ON \
+						"wget"			"$sys2" ON 3>&1 1>&2 2>&3)
 					if [ "$?" -gt "0" ]; then
 						err=true
 					fi
@@ -1823,7 +1794,7 @@ reboot_system() {
 			"$reboot2")		clear
 							echo -e "$arch_chroot_msg"
 							echo "/root" > /tmp/chroot_dir.var
-							arch_anywhere_chroot
+							archNAS_chroot
 							clear
 			;;
 			"$reboot3")		if (dialog --yes-button "$yes" --no-button "$no" --yesno "$user_exists_msg" 10 60); then
@@ -1921,7 +1892,7 @@ main_menu() {
 
 }
 
-arch_anywhere_chroot() {
+archNAS_chroot() {
 
 	local char=
     local input=

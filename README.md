@@ -13,6 +13,11 @@ http://arch-anywhere.org/
 
 ### Features:
 
+* Remote Shell
+
+    [SSH/SFTP](https://wiki.archlinux.org/index.php/Secure_Shell) <br />
+    For easy shell managment of the NAS and to provide encryption for tunneling.
+
 * WebUI
 
     [Cockpit](http://cockpit-project.org/) <br />
@@ -20,6 +25,7 @@ http://arch-anywhere.org/
 * Containers
 
     [Docker](https://www.docker.com/) <br />
+    Docker is used to install additional software for ease of use and the abilty to quickly customize and swap installs of different software.
     
 ### Future Features:
 
@@ -30,10 +36,6 @@ http://arch-anywhere.org/
     NFS <br />
     TFTP <br />
     Rsync <br />
-
-* Terminal
-
-    SSH/SFTP <br />
 
 
 #### To install follow the [Wiki](https://github.com/Pheoxy/archNAS/wiki)
