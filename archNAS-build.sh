@@ -161,7 +161,7 @@ prepare_x86_64() {
 	sudo cp "$aN"/extra/fetchmirrors "$customiso"/arch/x86_64/squashfs-root/usr/bin/fetchmirrors
 	sudo cp "$aN"/extra/sysinfo "$customiso"/arch/x86_64/squashfs-root/usr/bin/sysinfo
 	sudo cp "$aN"/extra/iptest "$customiso"/arch/x86_64/squashfs-root/usr/bin/iptest
-#	sudo chmod +x "$customiso"/arch/x86_64/squashfs-root/usr/bin/{archNAS,arch-wiki-lite,fetchmirrors,sysinfo,iptest}
+	sudo chmod +x "$customiso"/arch/x86_64/squashfs-root/usr/bin/{archNAS,arch-wiki-lite,fetchmirrors,sysinfo,iptest}
 #	sudo arch-chroot "$customiso"/arch/x86_64/squashfs-root /bin/bash -c "systemctl enable archNAS.service"
 
 ### Create archNAS directory and lang directory copy over all lang files
