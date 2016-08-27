@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set date
-date=$(date +"%Y_%m_%d")
+date=$(date +"%Y.%m.%d")
 
 # Set the version here
 export version="archNAS-$date-dual.iso"
@@ -121,14 +121,14 @@ builds() {
 		makepkg -s
 	fi
 
-	if [ ! -d /tmp/arch-wiki-cli ]; then
+#	if [ ! -d /tmp/arch-wiki-lite ]; then
 		### Build arch-wiki
-		cd /tmp
-		wget "https://aur.archlinux.org/cgit/aur.git/snapshot/arch-wiki-lite.tar.gz"
-		tar -xf arch-wiki-lite.tar.gz
-		cd arch-wiki-lite
-		makepkg -s
-	fi
+#		cd /tmp
+#		wget "http://muug.ca/mirror/archlinux/community/os/i686/arch-wiki-lite-20160308-2-any.pkg.tar.xz"
+#		tar -xJf arch-wiki-lite*.tar.xz
+#		cd arch-wiki-lite
+#		makepkg -s
+#	fi
 	prepare_x86_64
 
 }
@@ -156,19 +156,19 @@ prepare_x86_64() {
 	sudo cp "$aN"/etc/archNAS.conf "$customiso"/arch/x86_64/squashfs-root/etc/
 #	sudo cp "$aN"/etc/archNAS.service "$customiso"/arch/x86_64/squashfs-root/usr/lib/systemd/system/
 #	sudo cp "$aN"/archNAS-init.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS-init
-	sudo cp "$aN"/archNAS.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS
+	sudo cp "$aN"/archNAS-install.sh "$customiso"/arch/x86_64/squashfs-root/usr/bin/archNAS
 #	sudo cp "$aN"/extra/arch-wiki "$customiso"/arch/x86_64/squashfs-root/usr/bin/arch-wiki
 	sudo cp "$aN"/extra/fetchmirrors "$customiso"/arch/x86_64/squashfs-root/usr/bin/fetchmirrors
 	sudo cp "$aN"/extra/sysinfo "$customiso"/arch/x86_64/squashfs-root/usr/bin/sysinfo
 	sudo cp "$aN"/extra/iptest "$customiso"/arch/x86_64/squashfs-root/usr/bin/iptest
-	sudo chmod +x "$customiso"/arch/x86_64/squashfs-root/usr/bin/{archNAS,arch-wiki,fetchmirrors,sysinfo,iptest}
+#	sudo chmod +x "$customiso"/arch/x86_64/squashfs-root/usr/bin/{archNAS,arch-wiki-lite,fetchmirrors,sysinfo,iptest}
 #	sudo arch-chroot "$customiso"/arch/x86_64/squashfs-root /bin/bash -c "systemctl enable archNAS.service"
 
 ### Create archNAS directory and lang directory copy over all lang files
 	sudo mkdir -p "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/{lang,pkg}
 	sudo cp "$aN"/lang/* "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/lang
 	sudo cp /tmp/fetchmirrors/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
-	sudo cp /tmp/arch-wiki-lite/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
+#	sudo cp /tmp/arch-wiki-lite/*.pkg.tar.xz "$customiso"/arch/x86_64/squashfs-root/usr/share/archNAS/pkg
 
 ### Copy over extra files (dot files, desktop configurations, help file, issue file, hostname file)
 	sudo cp "$aN"/extra/{.zshrc,.help,.dialogrc} "$customiso"/arch/x86_64/squashfs-root/root/
@@ -213,15 +213,15 @@ prepare_i686() {
 	sudo cp "$aN"/etc/locale.gen "$customiso"/arch/i686/squashfs-root/etc
 	sudo arch-chroot squashfs-root /bin/bash locale-gen
 	sudo cp "$aN"/etc/vconsole.conf "$customiso"/arch/i686/squashfs-root/etc
-	sudo cp "$aN"/archNAS.sh "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS
+	sudo cp "$aN"/archNAS-install.sh "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS
 	sudo mkdir "$customiso"/arch/i686/squashfs-root/usr/share/archNAS
 	sudo mkdir "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/{lang,pkg}
 	sudo cp "$aN"/lang/* "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/lang
 	sudo cp /tmp/fetchmirrors/*.pkg.tar.xz "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/pkg
-	sudo cp /tmp/arch-wiki-cli/*.pkg.tar.xz "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/pkg
+#	sudo cp /tmp/arch-wiki-cli/*.pkg.tar.xz "$customiso"/arch/i686/squashfs-root/usr/share/archNAS/pkg
 	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/archNAS
-	sudo cp "$aN"/extra/arch-wiki "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
-	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
+#	sudo cp "$aN"/extra/arch-wiki "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
+#	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/arch-wiki
 	sudo cp "$aN"/extra/fetchmirrors "$customiso"/arch/i686/squashfs-root/usr/bin/fetchmirrors
 	sudo chmod +x "$customiso"/arch/i686/squashfs-root/usr/bin/fetchmirrors
 	sudo cp "$aN"/extra/sysinfo "$customiso"/arch/i686/squashfs-root/usr/bin/sysinfo
@@ -315,7 +315,7 @@ md5_sum=$(md5sum "$version" | awk '{print $1}')
 sha1_sum=$(sha1sum "$version" | awk '{print $1}')
 timestamp=$(timedatectl | grep "Universal" | awk '{print $4" "$5" "$6}')
 echo "Checksums generated. Saved to archNAS-checksums.txt"
-echo -e "- Arch Anywhere is licensed under GPL v2\n- Developer: Dylan Schacht (deadhead3492@gmail.com)\n- Webpage: http://arch-anywhere.org\n- ISO timestamp: $timestamp\n- $version Official Check Sums:\n\n* md5sum: $md5_sum\n* sha1sum: $sha1_sum" > archNAS-checksums.txt
+echo -e "Arch Anywhere is licensed under GPL v2\nAcrh Anywhere Developer: Dylan Schacht (deadhead3492@gmail.com)\n- Webpage: http://arch-anywhere.org\narchNAS Developer: Pheoxy (pheoxy@gmail.com)\nWebpage: https://github.com/Pheoxy/archNAS\nISO timestamp: $date\n- $version Official Check Sums:\n\n* md5sum: $md5_sum\n* sha1sum: $sha1_sum" > archNAS-checksums.txt
 echo
 echo "$version ISO generated successfully! Exiting ISO creator."
 echo
