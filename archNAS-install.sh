@@ -1545,7 +1545,9 @@ add_user() {
 
 	op_title="$user_op_msg"
 	if ! "$menu_enter" ; then
-		dialog --yes-button "$yes" --no-button "$no" --yesno "\n$user_msg0" 10 60)
+		dialog --yes-button "$yes" --no-button "$no" --yesno "\n$user_msg0" 10 60) then
+			install_software
+		fi
 	fi
 
 	user=$(dialog --nocancel --inputbox "\n$user_msg1" 12 55 "" 3>&1 1>&2 2>&3 | sed 's/ //g')
