@@ -1545,7 +1545,7 @@ add_user() {
 
 	op_title="$user_op_msg"
 	if ! "$menu_enter" ; then
-		dialog --yes-button "$yes" --no-button "$no" --yesno "\n$user_msg0" 10 60) then
+		if ! (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$user_msg0" 10 60) then
 			install_software
 		fi
 	fi
@@ -1590,7 +1590,29 @@ add_user() {
 
 	if "$menu_enter" ; then
 		reboot_system
+	else
+		install_software
 	fi
+
+}
+
+config_env() {
+
+	sh="/usr/bin/zsh"
+
+	if [ -n "$user" ]; then
+		mkdir "$ARCH"/home/"$user"/.config &> /dev/null
+		arch-chroot "$ARCH" chsh -s /usr/bin/zsh "$user" &> /dev/null
+		cp /usr/share/archNAS/.zshrc "$ARCH"/home/"$user"/
+		arch-chroot "$ARCH" /bin/bash -c "chown -R $user /home/$user"
+	fi
+
+	arch-chroot "$ARCH" chsh -s /usr/bin/zsh &> /dev/null
+	cp /usr/share/archNAS/.zshrc "$ARCH"/root/
+	mkdir "$ARCH"/root/.config/ &> /dev/null
+	cp -r /usr/share/archNAS/{.zshrc,desktop/.config/} "$ARCH"/etc/skel/
+	de_config=false
+
 
 }
 
@@ -1806,20 +1828,7 @@ reboot_system() {
 								reboot_system
 							fi
 			;;
-			"$reboot4")		if "$desktop" ; then
-								if (dialog --yes-button "$yes" --no-button "$no" --yesno "$desktop_exists_msg" 10 60); then
-									menu_enter=true
-									graphics
-								else
-									reboot_system
-								fi
-							else
-								if (dialog --yes-button "$yes" --no-button "$no" --yesno "$desktop_exists_msg" 10 60); then
-									graphics
-								fi
-							fi
-			;;
-			"$reboot5")		install_software
+			"$reboot4")		install_software
 			;;
 		esac
 
