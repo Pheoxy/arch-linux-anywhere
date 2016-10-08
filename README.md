@@ -18,22 +18,22 @@ http://arch-anywhere.org/
     [SSH/SFTP](https://wiki.archlinux.org/index.php/Secure_Shell) <br />
     For easy shell managment of the NAS and to provide encryption for tunneling.
 
-* WebUI
-
-    [Cockpit](http://cockpit-project.org/) <br />
-
 * Containers
 
     [Docker](https://www.docker.com/) <br />
     Docker is used to install additional software for ease of use and the abilty to quickly customize and swap installs of different software.
+
+* Network Sharing
+
+    FTP <br />
+    SFTP <br />
+    SMB/CIFS <br />
+    NFS <br />
     
 ### Future Features:
 
 * Network Sharing
 
-    FTP <br />
-    SMB/CIFS <br />
-    NFS <br />
     TFTP <br />
     Rsync <br />
 
